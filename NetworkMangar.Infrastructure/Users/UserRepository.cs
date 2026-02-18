@@ -66,4 +66,11 @@ public class UserRepository : IUserRepository
     {
         throw new NotImplementedException();
     }
+
+    public async Task DeleteAsync(User user)
+    {
+        using var context = await _contextFactory.CreateDbContextAsync();
+        context.Users.Remove(user);
+        await context.SaveChangesAsync();
+    }
 }

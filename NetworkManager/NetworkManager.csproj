@@ -50,6 +50,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\NetworkManager.Application\NetworkManager.Applications.csproj" />
+    <ProjectReference Include="..\NetworkManager.Domain\NetworkManager.Domain.csproj" />
     <ProjectReference Include="..\NetworkMangar.Infrastructure\NetworkMangar.Infrastructure.csproj" />
   </ItemGroup>
 

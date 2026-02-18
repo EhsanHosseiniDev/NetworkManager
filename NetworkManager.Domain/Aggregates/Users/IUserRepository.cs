@@ -6,6 +6,7 @@ public interface IUserRepository
     Task<IEnumerable<User>> GetAllAsync();
     Task AddAsync(User user);
     Task UpdateAsync(User user);
+    Task DeleteAsync(User user);
 
     //List<UserConfig> GetActiveUsers();
     void UpdateUsage(string userId, long up, long down);

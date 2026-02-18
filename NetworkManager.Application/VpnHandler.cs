@@ -1,6 +1,5 @@
 ﻿using NetworkManager.Domain;
 using NetworkManager.Domain.Aggregates.Users;
-using NetworkManager.Domain.Exeptions;
 using NetworkMangar.Infrastructure;
 using NetworkMangar.Infrastructure.Services.CloudflerTunnel;
 using NetworkMangar.Infrastructure.Services.Settings;
@@ -37,17 +36,36 @@ public class VpnHandler : IVpnHandler
         _tunnelService.OnTunnelUrlChanged += async (url) => await SendConfigsToAllUsers(url);
     }
 
-    public async Task StartAsync()
+    public async Task RefreshAsync()
     {
-        if (string.IsNullOrEmpty(_settingsService.Setting.TelegramBot))
-            new TelegramBotApiNotValidExeption();
+        if (!string.IsNullOrEmpty(_settingsService.Setting.TelegramBot))
+        {
+            _telegramBotListenerService.StartReceiving(_settingsService.Setting.TelegramBot);
+        }
 
         var users = await _userRepository.GetAllAsync();
         var activeUsers = users.Where(u => u.IsActive).ToList();
 
         await _configService.GenerateAndWriteConfigAsync(activeUsers);
 
-        _telegramBotListenerService.StartReceiving(_settingsService.Setting.TelegramBot);
+        _xrayProcess.Stop();
+        _xrayProcess.Start();
+        if (string.IsNullOrEmpty(_tunnelService.Host))
+            await _tunnelService.StartAsync();
+    }
+
+    public async Task StartAsync()
+    {
+        if (!string.IsNullOrEmpty(_settingsService.Setting.TelegramBot))
+        {
+            _telegramBotListenerService.StartReceiving(_settingsService.Setting.TelegramBot);
+        }
+
+        var users = await _userRepository.GetAllAsync();
+        var activeUsers = users.Where(u => u.IsActive).ToList();
+
+        await _configService.GenerateAndWriteConfigAsync(activeUsers);
+
         _xrayProcess.Stop();
         _xrayProcess.Start();
         await _tunnelService.StartAsync();
@@ -55,7 +73,10 @@ public class VpnHandler : IVpnHandler
 
     public async Task StopAsync()
     {
-        _telegramBotListenerService.StopReceiving();
+        if (!string.IsNullOrEmpty(_settingsService.Setting.TelegramBot))
+        {
+            _telegramBotListenerService.StopReceiving();
+        }
         _xrayProcess.Stop();
         _tunnelService.Stop();
     }

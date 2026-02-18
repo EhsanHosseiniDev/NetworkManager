@@ -7,6 +7,7 @@ using NetworkManager.ViewModels.Pages;
 using NetworkManager.ViewModels.Windows;
 using NetworkManager.Views.Pages;
 using NetworkManager.Views.Windows;
+using NetworkMangar.Infrastructure;
 using NetworkMangar.Infrastructure.Services.Settings;
 using System.IO;
 using System.Windows.Threading;
@@ -14,86 +15,70 @@ using Wpf.Ui;
 using Wpf.Ui.Appearance;
 using Wpf.Ui.DependencyInjection;
 
-namespace NetworkManager
+namespace NetworkManager;
+
+public partial class App
 {
-    /// <summary>
-    /// Interaction logic for App.xaml
-    /// </summary>
-    public partial class App
+    private static readonly IHost _host = Host
+        .CreateDefaultBuilder()
+        .ConfigureAppConfiguration(c => { c.SetBasePath(Path.GetDirectoryName(AppContext.BaseDirectory) ?? string.Empty); })
+        .ConfigureServices((context, services) =>
+        {
+            services.AddNavigationViewPageProvider();
+
+            services.AddHostedService<ApplicationHostService>();
+
+            services.AddSingleton<IThemeService, ThemeService>();
+
+            services.AddSingleton<ITaskBarService, TaskBarService>();
+            services.AddSingleton<IContentDialogService, ContentDialogService>();
+
+            services.AddSingleton<INavigationService, NavigationService>();
+
+            services.AddSingleton<INavigationWindow, MainWindow>();
+            services.AddSingleton<MainWindowViewModel>();
+
+            services.AddSingleton<DashboardPage>();
+            services.AddSingleton<DashboardViewModel>();
+
+            services.AddSingleton<UserManagerPage>();
+            services.AddSingleton<UserManagerViewModel>();
+
+            services.AddSingleton<SettingsPage>();
+            services.AddSingleton<SettingsViewModel>();
+
+            services.AddApplications(AppDomain.CurrentDomain.BaseDirectory);
+
+        }).Build();
+
+    public static IServiceProvider Services { get { return _host.Services; } }
+
+    private async void OnStartup(object sender, StartupEventArgs e)
     {
-        // The.NET Generic Host provides dependency injection, configuration, logging, and other services.
-        // https://docs.microsoft.com/dotnet/core/extensions/generic-host
-        // https://docs.microsoft.com/dotnet/core/extensions/dependency-injection
-        // https://docs.microsoft.com/dotnet/core/extensions/configuration
-        // https://docs.microsoft.com/dotnet/core/extensions/logging
-        private static readonly IHost _host = Host
-            .CreateDefaultBuilder()
-            .ConfigureAppConfiguration(c => { c.SetBasePath(Path.GetDirectoryName(AppContext.BaseDirectory) ?? string.Empty); })
-            .ConfigureServices((context, services) =>
+        await _host.StartAsync();
+        await Task.Run(() =>
+        {
+            using (var scope = _host.Services.CreateScope())
             {
-                services.AddNavigationViewPageProvider();
+                var dbContext = scope.ServiceProvider.GetRequiredService<AppDbContext>();
+                dbContext.Database.EnsureCreated();
+            }
+        });
 
-                services.AddHostedService<ApplicationHostService>();
+        var settingsService = Services.GetService<ISettingsService>();
+        if (settingsService!.Setting.IsDarkMode)
+            ApplicationThemeManager.Apply(ApplicationTheme.Dark);
+        else
+            ApplicationThemeManager.Apply(ApplicationTheme.Light);        
+    }
 
-                // Theme manipulation
-                services.AddSingleton<IThemeService, ThemeService>();
+    private async void OnExit(object sender, ExitEventArgs e)
+    {
+        await _host.StopAsync();
+        _host.Dispose();
+    }
 
-                // TaskBar manipulation
-                services.AddSingleton<ITaskBarService, TaskBarService>();
-                services.AddSingleton<IContentDialogService, ContentDialogService>();
-
-                // Service containing navigation, same as INavigationWindow... but without window
-                services.AddSingleton<INavigationService, NavigationService>();
-
-                // Main window with navigation
-                services.AddSingleton<INavigationWindow, MainWindow>();
-                services.AddSingleton<MainWindowViewModel>();
-
-                services.AddSingleton<DashboardPage>();
-                services.AddSingleton<DashboardViewModel>();
-                services.AddSingleton<SettingsPage>();
-                services.AddSingleton<SettingsViewModel>();
-
-                services.AddApplications(AppDomain.CurrentDomain.BaseDirectory);
-
-            }).Build();
-
-        /// <summary>
-        /// Gets services.
-        /// </summary>
-        public static IServiceProvider Services
-        {
-            get { return _host.Services; }
-        }
-
-        /// <summary>
-        /// Occurs when the application is loading.
-        /// </summary>
-        private async void OnStartup(object sender, StartupEventArgs e)
-        {
-            await _host.StartAsync();
-            var settingsService = Services.GetService<ISettingsService>();
-            if (settingsService!.Setting.IsDarkMode)
-                ApplicationThemeManager.Apply(ApplicationTheme.Dark);
-            else
-                ApplicationThemeManager.Apply(ApplicationTheme.Light);
-        }
-
-        /// <summary>
-        /// Occurs when the application is closing.
-        /// </summary>
-        private async void OnExit(object sender, ExitEventArgs e)
-        {
-            await _host.StopAsync();
-            _host.Dispose();
-        }
-
-        /// <summary>
-        /// Occurs when an exception is thrown by an application but not handled.
-        /// </summary>
-        private void OnDispatcherUnhandledException(object sender, DispatcherUnhandledExceptionEventArgs e)
-        {
-            // For more info see https://docs.microsoft.com/en-us/dotnet/api/system.windows.application.dispatcherunhandledexception?view=windowsdesktop-6.0
-        }
+    private void OnDispatcherUnhandledException(object sender, DispatcherUnhandledExceptionEventArgs e)
+    {
     }
 }

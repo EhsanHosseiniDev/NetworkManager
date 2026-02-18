@@ -1,9 +1,13 @@
 ﻿using System.Windows.Media;
 
-namespace NetworkManager.Models
+namespace NetworkManager.Models;
+
+public struct DataColor
 {
-    public struct DataColor
-    {
-        public Brush Color { get; set; }
-    }
+    public Brush Color { get; set; }
+}
+
+public class UserApp
+{
+
 }

@@ -1,0 +1,126 @@
+﻿<Page x:Class="NetworkManager.Views.Pages.UserManagerPage"
+      xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+      xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+      xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+      xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+      xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
+      xmlns:vm="clr-namespace:NetworkManager.ViewModels.Pages"
+      xmlns:models="clr-namespace:NetworkManager.Domain.Aggregates.Users;assembly=NetworkManager.Domain"
+      xmlns:helpers="clr-namespace:NetworkManager.Helpers"
+      mc:Ignorable="d" 
+      d:DataContext="{d:DesignInstance vm:UserManagerViewModel, IsDesignTimeCreatable=False}"
+      Loaded="Page_Loaded"
+      Title="UserManagerPage">
+
+    <Page.Resources>
+        <helpers:BytesToReadableStringConverter x:Key="BytesConverter"/>
+        <helpers:BoolToAppearanceConverter x:Key="BoolToAppearanceConverter"/>
+        <helpers:BoolToStringConverter x:Key="BoolToStringConverter"/>
+
+        <BooleanToVisibilityConverter x:Key="BoolToVis"/>
+    </Page.Resources>
+
+    <Grid Margin="20">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+
+        <ui:Card Grid.Row="0" Margin="0,0,0,20" Padding="15">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="Auto"/>
+                </Grid.ColumnDefinitions>
+
+                <ui:TextBox PlaceholderText="Name" 
+                            Text="{Binding NewUsername, UpdateSourceTrigger=PropertyChanged}" 
+                            Margin="0,0,10,0" Grid.Column="0"/>
+
+                <ui:TextBox PlaceholderText="@TelegramID" 
+                            Text="{Binding NewTelegramId, UpdateSourceTrigger=PropertyChanged}" 
+                            Icon="{ui:SymbolIcon Symbol=Send24}" 
+                            Margin="0,0,10,0" Grid.Column="1"/>
+
+                <ui:NumberBox Value="{Binding NewMonthlyLimitGb}" 
+                              Minimum="1" Maximum="1000" 
+                              Width="100" Margin="0,0,10,0" Grid.Column="2"/>
+
+                <ui:Button Appearance="Secondary" 
+                           Icon="{ui:SymbolIcon Symbol=Dismiss24}"
+                           Content="Cancel"
+                           Command="{Binding CancelEditCommand}"
+                           Visibility="{Binding IsEditing, Converter={StaticResource BoolToVis}}"
+                           VerticalAlignment="Bottom"
+                           Margin="0,0,5,0"
+                           Grid.Column="3"/>
+
+                <ui:Button Appearance="Primary" 
+                           Icon="{Binding SubmitButtonIcon}" 
+                           Content="{Binding SubmitButtonText}" 
+                           Command="{Binding SaveUserCommand}" 
+                           VerticalAlignment="Bottom" 
+                           Grid.Column="4"/>
+            </Grid>
+        </ui:Card>
+
+        <DataGrid Grid.Row="1" ItemsSource="{Binding Users}" AutoGenerateColumns="False" CanUserAddRows="False" SelectionMode="Single" HeadersVisibility="Column">
+            <DataGrid.Columns>
+
+                <DataGridTextColumn Header="User" Binding="{Binding Username}" Width="*" IsReadOnly="True"/>
+
+                <DataGridTemplateColumn Header="Telegram" Width="Auto">
+                    <DataGridTemplateColumn.CellTemplate>
+                        <DataTemplate DataType="{x:Type models:User}">
+                            <StackPanel Orientation="Horizontal">
+                                <ui:SymbolIcon Symbol="Send24" FontSize="12" Margin="0,0,5,0"/>
+                                <TextBlock Text="{Binding TelegramUsername}"/>
+                            </StackPanel>
+                        </DataTemplate>
+                    </DataGridTemplateColumn.CellTemplate>
+                </DataGridTemplateColumn>
+
+                <DataGridTemplateColumn Header="Usage" Width="120">
+                    <DataGridTemplateColumn.CellTemplate>
+                        <DataTemplate DataType="{x:Type models:User}">
+                            <TextBlock Text="{Binding TotalUsage, Converter={StaticResource BytesConverter}}"/>
+                        </DataTemplate>
+                    </DataGridTemplateColumn.CellTemplate>
+                </DataGridTemplateColumn>
+
+                <DataGridTemplateColumn Header="Status" Width="90">
+                    <DataGridTemplateColumn.CellTemplate>
+                        <DataTemplate DataType="{x:Type models:User}">
+                            <ui:Badge Appearance="{Binding IsActive, Converter={StaticResource BoolToAppearanceConverter}}" 
+                                      Content="{Binding IsActive, Converter={StaticResource BoolToStringConverter}}"/>
+                        </DataTemplate>
+                    </DataGridTemplateColumn.CellTemplate>
+                </DataGridTemplateColumn>
+
+                <DataGridTemplateColumn Header="Actions" Width="150">
+                    <DataGridTemplateColumn.CellTemplate>
+                        <DataTemplate DataType="{x:Type models:User}">
+                            <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
+
+                                <ui:Button Appearance="Secondary" Icon="{ui:SymbolIcon Symbol=Copy24}" ToolTip="Copy Link" 
+                                           Command="{Binding DataContext.CopyLinkCommand, RelativeSource={RelativeSource AncestorType=Page}}" 
+                                           CommandParameter="{Binding}" Margin="0,0,5,0"/>
+
+                                <ui:Button Appearance="Caution" Icon="{ui:SymbolIcon Symbol=Edit24}" ToolTip="Edit" 
+                                           Command="{Binding DataContext.PrepareEditCommand, RelativeSource={RelativeSource AncestorType=Page}}" 
+                                           CommandParameter="{Binding}" Margin="0,0,5,0"/>
+
+                                <ui:Button Appearance="Danger" Icon="{ui:SymbolIcon Symbol=Delete24}" ToolTip="Delete" 
+                                           Command="{Binding DataContext.DeleteUserCommand, RelativeSource={RelativeSource AncestorType=Page}}" 
+                                           CommandParameter="{Binding}"/>
+                            </StackPanel>
+                        </DataTemplate>
+                    </DataGridTemplateColumn.CellTemplate>
+                </DataGridTemplateColumn>
+            </DataGrid.Columns>
+        </DataGrid>
+    </Grid>
+</Page>
