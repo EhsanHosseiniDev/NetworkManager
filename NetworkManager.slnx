@@ -1,0 +1,9 @@
+<Solution>
+  <Folder Name="/Core/">
+    <Project Path="NetworkManager.Application/NetworkManager.Applications.csproj" />
+    <Project Path="NetworkManager.Domain/NetworkManager.Domain.csproj" />
+    <Project Path="NetworkMangar.Infrastructure/NetworkMangar.Infrastructure.csproj" />
+  </Folder>
+  <Project Path="NetworkManager.WindowsService/NetworkManager.WindowsService.csproj" />
+  <Project Path="NetworkManager/NetworkManager.csproj" />
+</Solution>
