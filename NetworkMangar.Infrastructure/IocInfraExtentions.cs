@@ -24,7 +24,7 @@ public static class IocInfraExtentions
         {
             Directory.CreateDirectory(Path.GetDirectoryName(xrayPath)!);
         }
-        services.AddSingleton<ISettingsService>(provider=>new JsonSettingsService(baseDirectory));
+        services.AddSingleton<ISettingsService>(provider => new JsonSettingsService(baseDirectory));
 
         services.AddDbContextFactory<AppDbContext>(options =>
         {
@@ -35,7 +35,7 @@ public static class IocInfraExtentions
         services.AddSingleton<IXrayConfigService>(provider =>
         {
             var settingService = provider.GetRequiredService<ISettingsService>();
-           
+
             settings = settingService.Setting;
             return new XrayConfigService(xrayPath, 10085, settings.XrayPort);
         });

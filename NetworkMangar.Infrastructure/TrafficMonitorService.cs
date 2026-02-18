@@ -7,7 +7,7 @@ namespace NetworkMangar.Infrastructure;
 public class TrafficMonitorService
 {
     private readonly IUserRepository _userRepository;
-    private readonly IXrayApiService _xrayApi; 
+    private readonly IXrayApiService _xrayApi;
     private readonly System.Timers.Timer _timer;
 
     public TrafficMonitorService(IUserRepository userRepository, IXrayApiService xrayApi)
@@ -26,13 +26,13 @@ public class TrafficMonitorService
     private async Task CheckTraffic()
     {
         try
-        {           
+        {
             var stats = await _xrayApi.GetTrafficStatsAsync();
 
             foreach (var stat in stats)
             {
                 if (stat.Upload > 0 || stat.Download > 0)
-                {                    
+                {
                     if (_userRepository is UserRepository repo)
                     {
                         await repo.UpdateTrafficUsageAsync(stat.Uuid, stat.Upload, stat.Download);

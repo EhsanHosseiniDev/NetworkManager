@@ -14,6 +14,5 @@ public class AppDbContext : DbContext
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         modelBuilder.Entity<User>().HasKey(u => u.Id);
-        modelBuilder.Entity<User>().HasIndex(u => u.TelegramChatId).IsUnique();
     }
 }

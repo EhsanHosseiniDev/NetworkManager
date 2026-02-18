@@ -28,7 +28,7 @@ public class XrayApiService : IXrayApiService, IDisposable
         var startInfo = new ProcessStartInfo
         {
             FileName = _xrayPath,
-            WorkingDirectory = Path.GetDirectoryName(_xrayPath), 
+            WorkingDirectory = Path.GetDirectoryName(_xrayPath),
             UseShellExecute = false,
             CreateNoWindow = true,
             RedirectStandardOutput = false,
@@ -45,7 +45,7 @@ public class XrayApiService : IXrayApiService, IDisposable
             if (_mainProcess != null && !_mainProcess.HasExited)
             {
                 _mainProcess.Kill();
-                _mainProcess.WaitForExit(2000); 
+                _mainProcess.WaitForExit(2000);
             }
         }
         catch (Exception)
@@ -59,7 +59,7 @@ public class XrayApiService : IXrayApiService, IDisposable
     }
 
     public async Task<IEnumerable<TrafficStatDto>> GetTrafficStatsAsync()
-    {       
+    {
         string output = await RunXrayCommandAsync($"api statsquery --server=127.0.0.1:{_apiPort}");
 
         return ParseXrayStats(output);
@@ -72,7 +72,7 @@ public class XrayApiService : IXrayApiService, IDisposable
             FileName = _xrayPath,
             Arguments = arguments,
             RedirectStandardOutput = true,
-            RedirectStandardError = true, 
+            RedirectStandardError = true,
             UseShellExecute = false,
             CreateNoWindow = true
         };
@@ -90,7 +90,7 @@ public class XrayApiService : IXrayApiService, IDisposable
         }
         catch (OperationCanceledException)
         {
-            process.Kill(); 
+            process.Kill();
             return string.Empty;
         }
         catch (Exception)
@@ -123,7 +123,7 @@ public class XrayApiService : IXrayApiService, IDisposable
                 if (keyParts.Length < 4) continue;
 
                 var email = keyParts[1];
-                var type = keyParts[3]; 
+                var type = keyParts[3];
 
                 if (!userStats.ContainsKey(email))
                 {

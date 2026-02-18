@@ -35,7 +35,7 @@ namespace NetworkManager.Services
         /// Creates main window during activation.
         /// </summary>
         private async Task HandleActivationAsync()
-        {            
+        {
             if (!Application.Current.Windows.OfType<MainWindow>().Any())
             {
                 _navigationWindow = (

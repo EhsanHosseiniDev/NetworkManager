@@ -2,6 +2,6 @@
 
 public interface ISettingsService
 {
-    AppSettings Setting { get; } 
+    AppSettings Setting { get; }
     Task SaveSettingsAsync(AppSettings setting);
 }

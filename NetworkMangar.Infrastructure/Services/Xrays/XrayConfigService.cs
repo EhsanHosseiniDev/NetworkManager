@@ -7,8 +7,8 @@ namespace NetworkMangar.Infrastructure.Services.Xrays;
 public class XrayConfigService : IXrayConfigService
 {
     private readonly string _xrayExecutablePath;
-    public  int ApiPort { get; }
-    public  int VlessPort { get; }
+    public int ApiPort { get; }
+    public int VlessPort { get; }
     private readonly string _configFilePath;
 
     public XrayConfigService(string xrayExecutablePath, int apiPort, int vlessPort)
@@ -26,11 +26,11 @@ public class XrayConfigService : IXrayConfigService
         var vlessClients = users.Where(u => u.IsActive).Select(u => new
         {
             id = u.Uuid,
-            email = u.Username, 
+            email = u.Username,
             level = 0
         }).ToArray();
 
-        
+
         var configStructure = new
         {
             log = new
@@ -40,15 +40,15 @@ public class XrayConfigService : IXrayConfigService
             api = new
             {
                 tag = "api",
-                services = new[] { "StatsService" } 
+                services = new[] { "StatsService" }
             },
-            stats = new { }, 
+            stats = new { },
             inbounds = new object[]
             {
                     new
                     {
                         listen = "127.0.0.1",
-                        port = ApiPort, 
+                        port = ApiPort,
                         protocol = "dokodemo-door",
                         settings = new { address = "127.0.0.1" },
                         tag = "api"
@@ -56,7 +56,7 @@ public class XrayConfigService : IXrayConfigService
                     new
                     {
                         listen = "127.0.0.1",
-                        port = VlessPort, 
+                        port = VlessPort,
                         protocol = "vless",
                         settings = new
                         {
@@ -65,10 +65,10 @@ public class XrayConfigService : IXrayConfigService
                         },
                         streamSettings = new
                         {
-                            network = "ws", 
+                            network = "ws",
                             wsSettings = new
                             {
-                                path = "/" 
+                                path = "/"
                             }
                         },
                         tag = "proxy"

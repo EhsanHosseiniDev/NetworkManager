@@ -55,10 +55,9 @@ public partial class App
 
     private async void OnStartup(object sender, StartupEventArgs e)
     {
-        await _host.StartAsync();
         await Task.Run(() =>
         {
-            using (var scope = _host.Services.CreateScope())
+            using (var scope = Services.CreateScope())
             {
                 var dbContext = scope.ServiceProvider.GetRequiredService<AppDbContext>();
                 dbContext.Database.EnsureCreated();
@@ -69,7 +68,9 @@ public partial class App
         if (settingsService!.Setting.IsDarkMode)
             ApplicationThemeManager.Apply(ApplicationTheme.Dark);
         else
-            ApplicationThemeManager.Apply(ApplicationTheme.Light);        
+            ApplicationThemeManager.Apply(ApplicationTheme.Light);
+
+        await _host.StartAsync();
     }
 
     private async void OnExit(object sender, ExitEventArgs e)

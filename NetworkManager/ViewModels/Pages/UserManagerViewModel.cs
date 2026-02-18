@@ -10,7 +10,7 @@ namespace NetworkManager.ViewModels.Pages;
 
 public partial class UserManagerViewModel : ObservableObject, INavigationAware
 {
-    public UserManagerViewModel(IUserRepository userRepository, 
+    public UserManagerViewModel(IUserRepository userRepository,
         IQuickTunnelService quickTunnelService, IVpnHandler vpnHandler)
     {
         _userRepository = userRepository;

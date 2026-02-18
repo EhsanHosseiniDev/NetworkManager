@@ -22,7 +22,7 @@ public class TelegramService : INotificationService
         var payload = new
         {
             chat_id = chatId,
-            text = message,          
+            text = message,
         };
 
         try

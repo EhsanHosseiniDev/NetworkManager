@@ -2,6 +2,7 @@
 using NetworkManager.Domain.Aggregates.Users;
 
 namespace NetworkMangar.Infrastructure.Users;
+
 public class UserRepository : IUserRepository
 {
     private readonly IDbContextFactory<AppDbContext> _contextFactory;
@@ -21,7 +22,7 @@ public class UserRepository : IUserRepository
     public async Task<IEnumerable<User>> GetAllAsync()
     {
         using var context = await _contextFactory.CreateDbContextAsync();
-        return await context.Users.AsNoTracking().ToListAsync(); 
+        return await context.Users.AsNoTracking().ToListAsync();
     }
 
     public async Task<User?> GetByIdAsync(int id)
@@ -43,7 +44,7 @@ public class UserRepository : IUserRepository
 
             if ((user.UploadUsage + user.DownloadUsage) >= user.MonthlyLimit)
             {
-                user.IsActive = false; 
+                user.IsActive = false;
             }
 
             await context.SaveChangesAsync();

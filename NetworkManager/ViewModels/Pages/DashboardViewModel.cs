@@ -38,7 +38,7 @@ public partial class DashboardViewModel : ObservableObject
     {
         _timer = new DispatcherTimer();
         _timer.Interval = TimeSpan.FromSeconds(3);
-        _timer.Tick += UpdateVpnStatusAsync;        
+        _timer.Tick += UpdateVpnStatusAsync;
     }
 
     private void UpdateVpnStatusAsync(object? sender, EventArgs e)
